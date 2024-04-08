@@ -12,8 +12,9 @@ namespace ExcavationMethod.Revit.Application.Buttons.DummyWpfModeless.Model
         public UIApplication UiApp = uiApp;
 
         public void DoSomething() 
-        { 
-
+        {
+            DummyWpfModelessRequestHandler.RequestId = RequestId.DoSomething;
+            DummyWpfModelessRequestHandler.ExternalEventHandler.Raise();
         }
     }
 }
