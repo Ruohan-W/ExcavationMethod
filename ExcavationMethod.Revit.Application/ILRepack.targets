@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Target Name="DetermineILMergeInputsOutputs">
+		<PropertyGroup>
+			<OutputAssembly>$(OutputPath)ExcavationMethod.Revit.Application.dll</OutputAssembly>
+		</PropertyGroup>
+		<ItemGroup>
+			<ExcludeMergeAssemblies Include="$(OutputAssembly)" />
+			<ExcludeMergeAssemblies Include="$(OutputPath)msalruntime.dll" />
+		</ItemGroup>
+		<ItemGroup>
+			<IncludeMergeAssemblies Include="$(OutputPath)ExcavationMethod.*.dll" />
+			<IncludeMergeAssemblies Include="$(OutputPath)CommunityToolkit.Mvvm.dll" />
+			<IncludeMergeAssemblies Include="$(OutputPath)ControlzEx.dll" />
+			<IncludeMergeAssemblies Include="$(OutputPath)MahApps*.dll" />
+			<IncludeMergeAssemblies Include="$(OutputPath)NPOI*.dll" />
+			<IncludeMergeAssemblies Include="$(OutputPath)Newtonsoft*.dll" />
+			<IncludeMergeAssemblies Include="$(OutputPath)Microsoft.Bcl.AsyncInterfaces.dll" />
+			<IncludeMergeAssemblies Include="$(OutputPath)Microsoft.Identity*.dll" />
+			<IncludeMergeAssemblies Include="$(OutputPath)Microsoft.ApplicationInsights.dll" />
+			<IncludeMergeAssemblies Include="$(OutputPath)System.Diagnostics.DiagnosticSource.dll" />
+			<IncludeMergeAssemblies Include="$(OutputPath)System.Threading.Tasks.Extensions.dll" />
+		</ItemGroup>
+		<ItemGroup>
+			<RevitApiDlls Include="$(PkgNice3point_Revit_Api_RevitAPIUI)\ref\$(RevitFramework)\RevitAPIUI.dll" />
+			<RevitApiDlls Include="$(PkgNice3point_Revit_Api_RevitAPI)\ref\$(RevitFramework)\RevitAPI.dll" />
+			<RevitApiDlls Include="$(PkgNice3point_Revit_Api_AdWindows)\ref\$(RevitFramework)\AdWindows.dll" />
+		</ItemGroup>
+		<ItemGroup>
+			<!-- Target assemblies with binding redirects following back to calling assemblies -->
+			<MergeAssemblies Include="@(IncludeMergeAssemblies)" Exclude="@(ExcludeMergeAssemblies)" />
+		</ItemGroup>
+		<Message Text="ILMerge output: $(OutputAssembly). Assemblies: @(MergeAssemblies). Revit: @(RevitApiDlls)" Importance="High" />
+	</Target>
+
+	<Target Name="ILRepacker" AfterTargets="Build" DependsOnTargets="DetermineILMergeInputsOutputs">
+		<Message Text="Input assemblies: @(MergeAssemblies)" Importance="High" />
+		<ILRepack Parallel="true"
+				Internalize="false"
+				DebugInfo="true"
+				InputAssemblies="$(OutputAssembly);@(MergeAssemblies)"
+				LibraryPath="$(OutputPath);@(RevitApiDlls->'%(RelativeDir)')"
+				TargetKind="Dll"
+				TargetPlatformVersion="v4"
+				TargetPlatformDirectory="$(FrameworkDir)$(FrameworkVersion)"
+				OutputFile="$(OutputAssembly)"
+				Union="false"
+				CopyAttributes="true"
+				AllowMultiple="true"
+				Wildcards="false" />
+	</Target>
+
+	<Target Name="DeleteMergedAssemblies" AfterTargets="ILRepacker">
+		<Message Text="Deleting merged .dll and .pdb files" Importance="High" />
+		<Delete Files="@(MergeAssemblies)" />
+		<Delete Files="@(MergeAssemblies->'%(RelativeDir)%(Filename).pdb')" />
+	</Target>
+
+</Project>

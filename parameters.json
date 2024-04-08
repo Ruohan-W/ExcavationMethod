@@ -1,0 +1,6 @@
+{
+  "$schema": "./build.schema.json",
+  "Solution": "src/ExcavationMethod.sln",
+  "Version": "0.0.0.0",
+  "Configuration": "Debug"
+}

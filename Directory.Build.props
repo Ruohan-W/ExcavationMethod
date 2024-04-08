@@ -1,0 +1,7 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <!-- Generate full PDB type to allow debugging ILMerge output assembly -->
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+</Project>

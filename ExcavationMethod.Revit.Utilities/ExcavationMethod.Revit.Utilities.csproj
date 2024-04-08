@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+	<NoWarn>CS0649;CS0169;MSB3270;CS0168</NoWarn>
+	<Configurations>Debug R23;Debug R24;Release R23;Release R24</Configurations>
+	<Configurations>$(Configurations);Release R23;Release R24</Configurations>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <Choose>
+	<When Condition="'$(AssemblyInformationalVersion)' == '' ">
+		<PropertyGroup>
+			<Version>0.0.0.0</Version>
+		</PropertyGroup>
+	</When>
+	<When Condition="'$(AssemblyInformationalVersion)' != '' ">
+		<PropertyGroup>
+			<Version>$(AssemblyVersionNumber)</Version>
+		</PropertyGroup>
+	</When>
+  </Choose>
+
+  <PropertyGroup Condition="$(Configuration.Contains('R23'))">
+	<RevitVersion>2023</RevitVersion>
+	<RevitFramework>net48</RevitFramework>
+		<Optimize>True</Optimize>
+		<NoWarn>CS0649;CS0169;MSB3270;CS0168</NoWarn>
+		<DefineConstants>$(DefineConstants);R23</DefineConstants>
+		<DefineConstants>$(DefineConstants);R20_OR_GREATER;R21_OR_GREATER;R22_OR_GREATER;R23_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('R24'))">
+		<RevitVersion>2024</RevitVersion>
+		<RevitFramework>net48</RevitFramework>
+		<Optimize>True</Optimize>
+		<NoWarn>CS0649;CS0169;MSB3270;CS0168</NoWarn>
+		<DefineConstants>$(DefineConstants);R24</DefineConstants>
+		<DefineConstants>$(DefineConstants);R20_OR_GREATER;R21_OR_GREATER;R22_OR_GREATER;R23_OR_GREATER;R24_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<Reference Include="PresentationCore" />
+	<Reference Include="PresentationFramework" />
+	<Reference Include="WindowsBase" />
+  </ItemGroup>
+
+  <PropertyGroup>
+	<!--<Version>$(RevitVersion)</Version>-->
+	<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="NETStandard.Library" Version="2.0.3" />
+    <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="2024.2.0" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="2024.2.0" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2024.2.0" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\ExcavationMethod.Domain\ExcavationMethod.Domain.csproj" />
+    <ProjectReference Include="..\ExcavationMethod.Updates\ExcavationMethod.Updates.csproj" />
+  </ItemGroup>
+
+</Project>

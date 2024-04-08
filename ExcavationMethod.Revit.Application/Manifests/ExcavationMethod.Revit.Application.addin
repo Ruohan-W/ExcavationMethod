@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+	<AddIn Type="Application">
+		<Name>Excavation Method</Name>
+		<Assembly>ExcavationMethod.Revit.Application/0.0.0.0/ExcavationMethod.Revit.Application.dll</Assembly>
+		<AddInId>987B6E4D-69E9-4659-9EFB-8338C02B8527</AddInId>
+		<FullClassName>ExcavationMethod.Revit.Application.AppCommand</FullClassName>
+		<VendorId>AECOM</VendorId>
+		<VendorDescription>AECOM, www.aecom.com</VendorDescription>
+	</AddIn>
+</RevitAddIns>

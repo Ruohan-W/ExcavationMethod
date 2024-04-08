@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+	<NoWarn>CS0649;CS0169;MSB3270;CS0168</NoWarn>
+	<Platforms>AnyCPU</Platforms>
+	<Configuration>Debug R23; Debug R24; Release R23; Release R24</Configuration>
+	<Configuration>$(Configurations); Release R23; Release 24</Configuration>
+	<DefineConstants>DEBUG; RELEASE</DefineConstants>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+	
+  <Choose>
+	<When Condition="'$(AssemblyInformationalVersion)' == '' ">
+		<PropertyGroup>
+			<Version>0.0.0.0</Version>
+		</PropertyGroup>
+	</When>
+	<When Condition="'$(AssemblyInformationalVersion)' != '' ">
+		<PropertyGroup>
+			<Version>$(AssemblyVersionNumber)</Version>
+		</PropertyGroup>
+	</When>
+  </Choose>
+
+  <PropertyGroup Condition="$(Configuration.Contains('R23'))">
+	<RevitVersion>2023</RevitVersion>
+	<RevitFramework>net48</RevitFramework>
+	<DefineConstants>$(DefineConstants);R23</DefineConstants>
+	<DefineConstants>$(DefineConstants);R23_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('R24'))">
+	<RevitVersion>2024</RevitVersion>
+	<RevitFramework>net48</RevitFramework>
+	<DefineConstants>$(DefineConstants);R24</DefineConstants>
+	<DefineConstants>$(DefineConstants);R23_OR_GREATER;R24_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.22.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExcavationMethod.Domain\ExcavationMethod.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

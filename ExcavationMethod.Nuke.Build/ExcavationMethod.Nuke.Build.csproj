@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+	<NoWarn>CS0649;CS0169</NoWarn>
+    <TargetFramework>net8.0</TargetFramework>
+	<NukeRootDirectory>..</NukeRootDirectory>
+	<NukeScriptDirectory>..</NukeScriptDirectory>
+	<NukeTelemetryVersion>1</NukeTelemetryVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>Disable</Nullable>
+	<Platforms>AnyCPU</Platforms>
+    <Configurations>Debug;Release;Debug Nuke;Release Nuke;Debug Functions;Release Functions;Debug R23;Release R23</Configurations>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nuke.Common" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+	<PackageDownload Include="GitVersion.Tool" Version="[5.12.0]" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ExcavationMethod.Revit.Installer\ExcavationMethod.Revit.Installer.csproj" />
+    <ProjectReference Include="..\ExcavationMethod.Revit.PackageBuilder\ExcavationMethod.Revit.PackageBuilder.csproj" />
+  </ItemGroup>
+</Project>

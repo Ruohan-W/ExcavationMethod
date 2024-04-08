@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+	<NoWarn>CS0649;CS0169;MSB3270;CS0168</NoWarn>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug R23;Release R23;Debug R24;Release R24</Configurations>
+	<Configurations>$(Configurations);Release R23;Release R24</Configurations>
+  </PropertyGroup>
+
+  <Choose>
+	<When Condition="'$(AssemblyInformationalVersion)' == '' ">
+		<PropertyGroup>
+			<Version>0.0.0.0</Version>
+		</PropertyGroup>
+	</When>
+	<When Condition="'$(AssemblyInformationalVersion)' != '' ">
+		<PropertyGroup>
+			<Version>$(AssemblyVersionNumber)</Version>
+		</PropertyGroup>
+	</When>
+  </Choose>
+	
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Graph" Version="5.44.0" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <ProjectReference Include="..\ExcavationMethod.Authentication\ExcavationMethod.Authentication.csproj" />
+  </ItemGroup>
+
+</Project>

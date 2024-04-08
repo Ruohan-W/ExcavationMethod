@@ -1,0 +1,141 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	<UseWPF>true</UseWPF>
+	<NoWarn>CS0649;CS0169;MSB3270;CS0168</NoWarn>
+	<RootNamespace>ExcavationMethod.Revit.Application</RootNamespace>
+	<PlatformTarget>x64</PlatformTarget>
+    <TargetFramework>net48</TargetFramework>
+    <ImplicitUsings>true</ImplicitUsings>
+	<LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+	<LangVersion>latest</LangVersion>
+	<Configurations>Debug R23;Debug R24</Configurations>
+	<Configurations>$(Configurations);Release R23;Release R24</Configurations>
+  </PropertyGroup>
+
+  <Choose>
+	<When Condition="'$(AssemblyVersion)' == '' ">
+		<PropertyGroup>
+			<Version>0.0.0.0</Version>
+		</PropertyGroup>
+	</When>
+	<When Condition="'$(AssemblyVersion)' != '' ">
+		<PropertyGroup>
+			<Version>$(AssemblyVersion)</Version>
+		</PropertyGroup>
+	</When>
+  </Choose>
+	
+  <PropertyGroup Condition="$(Configuration.Contains('R23'))">
+	<RevitVersion>2023</RevitVersion>
+	<RevitFramework>net48</RevitFramework>
+    <Optimize>False</Optimize>
+    <NoWarn>CS0649;CS0169;MSB3270;CS0168</NoWarn>
+	<DefineConstants>$(DefineConstants);R23</DefineConstants>
+	<DefineConstants>$(DefineConstants);R23_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.Contains('R24'))">
+	<RevitVersion>2024</RevitVersion>
+	<RevitFramework>net48</RevitFramework>
+	<Optimize>False</Optimize>
+	<NoWarn>CS0649;CS0169;MSB3270;CS0168</NoWarn>
+	<DefineConstants>$(DefineConstants);R24</DefineConstants>
+	<DefineConstants>$(DefineConstants);R23_OR_GREATER;R24_OR_GREATER</DefineConstants>
+  </PropertyGroup>
+
+	
+  <PropertyGroup>
+	<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+	<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+	<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+	<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+	
+  <PropertyGroup>
+	<StartAction>Program</StartAction>
+	<StartProgram>C:\Program Files\Autodesk\Revit $(RevitVersion)\Revit.exe</StartProgram>
+	<StartArguments>/language ENG</StartArguments>
+  </PropertyGroup>
+	
+  <ItemGroup>
+    <None Remove="Resources\32x32\Placeholder.png" />
+    <None Remove="Resources\Logo\AECOM_White.png" />
+  </ItemGroup>
+	
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\32x32\Placeholder.png" />
+    <EmbeddedResource Include="Resources\Logo\AECOM_White.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+	
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="ILRepack.Lib.MSBuild.Task" Version="2.0.26">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MahApps.Metro" Version="2.4.10" />
+    <PackageReference Include="MahApps.Metro.IconPacks" Version="4.11.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Nice3point.Revit.Api.AdWindows" Version="2024.2.0" GeneratePathProperty="true" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="2024.2.0" GeneratePathProperty="true" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="2024.2.0" GeneratePathProperty="true" />
+    <PackageReference Include="NPOI" Version="2.6.2" />
+    <PackageReference Include="Serilog" Version="3.1.1" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
+    <PackageReference Include="WindowsAPICodePack-Shell" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExcavationMethod.Abstractions\ExcavationMethod.Abstractions.csproj" />
+    <ProjectReference Include="..\ExcavationMethod.Authentication\ExcavationMethod.Authentication.csproj" />
+    <ProjectReference Include="..\ExcavationMethod.Domain\ExcavationMethod.Domain.csproj" />
+    <ProjectReference Include="..\ExcavationMethod.Revit.Utilities\ExcavationMethod.Revit.Utilities.csproj" />
+    <ProjectReference Include="..\ExcavationMethod.Telemetry\ExcavationMethod.Telemetry.csproj" />
+    <ProjectReference Include="..\ExcavationMethod.Updates\ExcavationMethod.Updates.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ILRepack.targets">
+      <Generator>MSBuild:Compile</Generator>
+    </None>
+  </ItemGroup>
+
+  <Target Name="CopyFiles" AfterTargets="DeleteMergedAssemblies">
+	<ItemGroup>
+		<RootItem Include="$(ProjectDir)Manifests\*.addin" />
+		<Manifests Inckude="$(ProjectDir)Manifests\*.json" />
+		<AddinItem Include="$(TargetDir)*.dll;$(TargetDir)*.pdb;$(TargetDir)/runtimes/win-x64/native/*.dll" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<RootDir>bin\$(RevitVersion)\</RootDir>
+		<AddinDir>$(RootDir)$(AssemblyName)\$(Version)\</AddinDir>
+	</PropertyGroup>
+
+	<Copy SourceFiles="@(RootItem)" DestinationFolder="$(RootDir)" />
+	<Copy SourceFiles="@(AddinItem)" DestinationFolder="$(AddinDir)" />
+	<Copy SourceFiles="@(Manifests)" DestinationFolder="$(AddinDir)" />
+
+	<ItemGroup>
+		<AddinFiles Include="$(RootDir)**\*.*" />
+	</ItemGroup>
+
+	<Copy SourceFiles="@(AddinFiles)" DestinationFolder="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\%(RecursiveDir)" />
+	<Copy SourceFiles="@(AddinFiles)" DestinationFolder="..\..\dist\Revit\$(RevitVersion)\%(RecursiveDir)" />
+  </Target>
+
+  <Target Name="DeleteFiles" AfterTargets="Clean">
+	<RemoveDir Directories="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\$(ProjectName)" />
+	<Delete Files="$(AppData)\Autodesk\Revit\Addins\$(RevitVersion)\$(ProjectName).addin" />
+	<RemoveDir Directories="..\..\dist\$(RevitVersion)" />
+	<RemoveDir Directories="bin\" />
+  </Target>
+
+</Project>

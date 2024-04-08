@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+	<NoWarn>CS0649;CS0169;MSB3270;CS0168</NoWarn>
+	<Platforms>AnyCPU</Platforms>
+	<Configuration>Debug R23;Debug R24;Release R23; Release R24</Configuration>
+	<Configuration>$(Configurations); Release R23; Release R24</Configuration>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Configurations>Debug;Release;Debug R23</Configurations>
+  </PropertyGroup>
+
+  <Choose>
+	<When Condition="'$(AssemblyInformationalVersion)' == '' ">
+		<PropertyGroup>
+			<Version>0.0.0.0</Version>
+		</PropertyGroup>
+	</When>
+	<When Condition="'$(AssemblyInformationalVersion)' != '' ">
+		<PropertyGroup>
+			<Version>$(AssemblyVersionNumber)</Version>
+		</PropertyGroup>
+	</When>
+  </Choose>
+
+</Project>

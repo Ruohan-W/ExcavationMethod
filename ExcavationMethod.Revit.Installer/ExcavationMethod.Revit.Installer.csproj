@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+	<NoWarn>CS0649;CS0169;MSB3270;CS0168</NoWarn>
+	<Platforms>AnyCPU</Platforms>
+	<Configurations>Debug;Release;Debug Nuke;Release Nuke;Debug Functions;Release Functions;Debug R23;Release R23</Configurations>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <EnableNETAnalyzers>False</EnableNETAnalyzers>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="InnoSetup.ScriptBuilder" Version="1.3.1" />
+    <PackageReference Include="NETStandard.Library" Version="2.0.3" />
+  </ItemGroup>
+
+</Project>
