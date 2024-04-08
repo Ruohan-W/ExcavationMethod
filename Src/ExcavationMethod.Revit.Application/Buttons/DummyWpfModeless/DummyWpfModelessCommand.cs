@@ -18,6 +18,9 @@ namespace ExcavationMethod.Revit.Application.Buttons.DummyWpfModeless
     [Journaling(JournalingMode.NoCommandData)]
     public class DummyWpfModelessCommand : IExternalCommand
     {
+        readonly string ButtonName = "Dummy Wpf\nModeless";
+        readonly string ButtonDescription = "toolTip description goes here";
+        readonly string ButtonIcon = IconsPackX32.Placeholder;
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             try 
@@ -48,21 +51,21 @@ namespace ExcavationMethod.Revit.Application.Buttons.DummyWpfModeless
         }
 
         public static void CreateButton(RibbonPanel panel)
-        {
+        {        
+            DummyWpfModelessCommand command = new DummyWpfModelessCommand();
+            string buttonName = command.ButtonName;
+            string buttonDescription = command.ButtonDescription;
+            string buttonIcon = command.ButtonIcon;
+
             Assembly assembly = Assembly.GetExecutingAssembly();
-            PushButtonData button = new PushButtonData(
-                MethodBase.GetCurrentMethod().DeclaringType?.Name,
-                "Dummy Wpf\nModeless",
-                assembly.Location,
-                MethodBase.GetCurrentMethod().DeclaringType?.FullName
-                )
+            string? methodName = MethodBase.GetCurrentMethod().DeclaringType?.Name;
+            string? methodFullName = MethodBase.GetCurrentMethod().DeclaringType?.FullName;
+
+            if(methodName != null && methodFullName != null)
             {
-                ToolTip = "toolTip goes here",
-                LargeImage = ImageUtils.LoadImage(
-                    assembly,
-                    IconsPackX32.Placeholder)
-            };
-            panel.AddItem( button );
+                PushButtonData button = RibbonUtils.FillPushButtonData(assembly, methodName, buttonName, methodFullName, buttonDescription, buttonIcon);
+                panel.AddItem(button);
+            }
         }
     }
 }

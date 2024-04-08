@@ -98,6 +98,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Buttons\InstallPiles\Model\" />
+    <Folder Include="Buttons\InstallPiles\ViewModel\" />
+    <Folder Include="Buttons\InstallPiles\View\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 

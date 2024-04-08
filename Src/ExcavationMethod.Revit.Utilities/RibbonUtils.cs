@@ -65,23 +65,23 @@ namespace ExcavationMethod.Revit.Utilities
             }
             return null;
         }
-        public static void CreateButton(Autodesk.Revit.UI.RibbonPanel panel, string itemName, string toolTip, string iconName)
+
+        public static PushButtonData FillPushButtonData(Assembly assembly, string methodName, string buttonName, string methodFullName,string buttonToolTip, string iconName)
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            string? namespaceText = MethodBase.GetCurrentMethod().DeclaringType?.FullName;
             var button = new PushButtonData(
-                MethodBase.GetCurrentMethod().DeclaringType?.Name,
-                itemName,
+                methodName,
+                buttonName,
                 assembly.Location,
-                MethodBase.GetCurrentMethod().DeclaringType?.FullName
+                methodFullName
                 )
             {
-                ToolTip = toolTip,
+                ToolTip = buttonToolTip,
                 LargeImage = ImageUtils.LoadImage(
                     assembly,
                     iconName)
             };
-            panel.AddItem( button );
+
+            return button;
         }
     }
 }

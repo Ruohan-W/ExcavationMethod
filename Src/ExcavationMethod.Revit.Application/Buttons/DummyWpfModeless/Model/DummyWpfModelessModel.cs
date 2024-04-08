@@ -14,7 +14,7 @@ namespace ExcavationMethod.Revit.Application.Buttons.DummyWpfModeless.Model
         public void DoSomething() 
         {
             DummyWpfModelessRequestHandler.RequestId = RequestId.DoSomething;
-            DummyWpfModelessRequestHandler.ExternalEventHandler.Raise();
+            DummyWpfModelessRequestHandler.ExternalEventHandler?.Raise();
         }
     }
 }
