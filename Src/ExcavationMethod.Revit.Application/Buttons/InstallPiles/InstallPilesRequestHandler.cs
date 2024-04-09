@@ -1,5 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using ExcavationMethod.Revit.Utilities;
 using System;
 using System.Collections.Generic;
@@ -53,6 +55,15 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles
 
             // select wall from linked file
             // or select 2D or 3D lines from current file
+
+            UIDocument uidoc = new UIDocument(doc);
+            Selection choices = uidoc.Selection;
+            // Pick one object from Revit.
+            Reference hasPickOne = choices.PickObject(ObjectType.Element);
+            if (hasPickOne != null)
+            {
+                TaskDialog.Show("Revit", "One element selected.");
+            }
 
             // select available pile familiy from drop down list
 

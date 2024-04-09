@@ -129,7 +129,6 @@ Global
 		{33C4B659-0BDD-43C6-B58C-3F27383C5C2C}.Debug R23|Any CPU.ActiveCfg = Debug R23|Any CPU
 		{33C4B659-0BDD-43C6-B58C-3F27383C5C2C}.Debug R24|Any CPU.ActiveCfg = Debug Nuke|Any CPU
 		{33C4B659-0BDD-43C6-B58C-3F27383C5C2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{33C4B659-0BDD-43C6-B58C-3F27383C5C2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33C4B659-0BDD-43C6-B58C-3F27383C5C2C}.Release Functions|Any CPU.ActiveCfg = Release Functions|Any CPU
 		{33C4B659-0BDD-43C6-B58C-3F27383C5C2C}.Release Functions|Any CPU.Build.0 = Release Functions|Any CPU
 		{33C4B659-0BDD-43C6-B58C-3F27383C5C2C}.Release Nuke|Any CPU.ActiveCfg = Release Nuke|Any CPU
@@ -138,7 +137,6 @@ Global
 		{33C4B659-0BDD-43C6-B58C-3F27383C5C2C}.Release R23|Any CPU.Build.0 = Release R23|Any CPU
 		{33C4B659-0BDD-43C6-B58C-3F27383C5C2C}.Release R24|Any CPU.ActiveCfg = Release Nuke|Any CPU
 		{33C4B659-0BDD-43C6-B58C-3F27383C5C2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{33C4B659-0BDD-43C6-B58C-3F27383C5C2C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2DB13D5A-EA97-418A-AA9D-DA4E5026C27C}.Debug Functions|Any CPU.ActiveCfg = Debug R23|Any CPU
 		{2DB13D5A-EA97-418A-AA9D-DA4E5026C27C}.Debug Functions|Any CPU.Build.0 = Debug R23|Any CPU
 		{2DB13D5A-EA97-418A-AA9D-DA4E5026C27C}.Debug Nuke|Any CPU.ActiveCfg = Debug R23|Any CPU
@@ -166,7 +164,6 @@ Global
 		{10B7334C-A053-4387-9809-1CE1FEE78CFA}.Debug R23|Any CPU.ActiveCfg = Debug R23|Any CPU
 		{10B7334C-A053-4387-9809-1CE1FEE78CFA}.Debug R24|Any CPU.ActiveCfg = Debug Nuke|Any CPU
 		{10B7334C-A053-4387-9809-1CE1FEE78CFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{10B7334C-A053-4387-9809-1CE1FEE78CFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{10B7334C-A053-4387-9809-1CE1FEE78CFA}.Release Functions|Any CPU.ActiveCfg = Release Functions|Any CPU
 		{10B7334C-A053-4387-9809-1CE1FEE78CFA}.Release Functions|Any CPU.Build.0 = Release Functions|Any CPU
 		{10B7334C-A053-4387-9809-1CE1FEE78CFA}.Release Nuke|Any CPU.ActiveCfg = Release Nuke|Any CPU
@@ -174,7 +171,6 @@ Global
 		{10B7334C-A053-4387-9809-1CE1FEE78CFA}.Release R23|Any CPU.ActiveCfg = Release R23|Any CPU
 		{10B7334C-A053-4387-9809-1CE1FEE78CFA}.Release R24|Any CPU.ActiveCfg = Release Nuke|Any CPU
 		{10B7334C-A053-4387-9809-1CE1FEE78CFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{10B7334C-A053-4387-9809-1CE1FEE78CFA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{049DD188-E08C-4C7D-966C-4D559DC1CBCA}.Debug Functions|Any CPU.ActiveCfg = Debug R23|Any CPU
 		{049DD188-E08C-4C7D-966C-4D559DC1CBCA}.Debug Functions|Any CPU.Build.0 = Debug R23|Any CPU
 		{049DD188-E08C-4C7D-966C-4D559DC1CBCA}.Debug Nuke|Any CPU.ActiveCfg = Debug R23|Any CPU
@@ -242,7 +238,6 @@ Global
 		{FB05C101-D175-4A6D-B242-F2CD565EA129}.Debug R23|Any CPU.ActiveCfg = Debug R23|Any CPU
 		{FB05C101-D175-4A6D-B242-F2CD565EA129}.Debug R24|Any CPU.ActiveCfg = Debug Nuke|Any CPU
 		{FB05C101-D175-4A6D-B242-F2CD565EA129}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FB05C101-D175-4A6D-B242-F2CD565EA129}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FB05C101-D175-4A6D-B242-F2CD565EA129}.Release Functions|Any CPU.ActiveCfg = Release Nuke|Any CPU
 		{FB05C101-D175-4A6D-B242-F2CD565EA129}.Release Functions|Any CPU.Build.0 = Release Nuke|Any CPU
 		{FB05C101-D175-4A6D-B242-F2CD565EA129}.Release Nuke|Any CPU.ActiveCfg = Release Nuke|Any CPU
@@ -250,7 +245,6 @@ Global
 		{FB05C101-D175-4A6D-B242-F2CD565EA129}.Release R23|Any CPU.ActiveCfg = Release R23|Any CPU
 		{FB05C101-D175-4A6D-B242-F2CD565EA129}.Release R24|Any CPU.ActiveCfg = Release Nuke|Any CPU
 		{FB05C101-D175-4A6D-B242-F2CD565EA129}.Release|Any CPU.ActiveCfg = Release Nuke|Any CPU
-		{FB05C101-D175-4A6D-B242-F2CD565EA129}.Release|Any CPU.Build.0 = Release Nuke|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

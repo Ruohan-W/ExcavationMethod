@@ -25,6 +25,12 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="100"/>
         </Grid.RowDefinitions>
+        <Button Grid.Row = "0" x:Name="SelectReferenceObject" Height="35" Width="100"
+                Command="{Binding InstallPilesCommand, Mode = OneWay}"
+                HorizontalAlignment="Center"
+                Margin="10">
+            <Button.Content>Select</Button.Content>
+        </Button>
         <Button Grid.Row = "1" x:Name="Close" Height="35" Width="100"
                 Command="{Binding CloseCommand, Mode = OneWay}"
                 CommandParameter="{Binding ElementName=Win}"
