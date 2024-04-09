@@ -4,55 +4,56 @@ using Autodesk.Revit.Attributes;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.DB;
 
-using ExcavationMethod.Revit.Application.Buttons.DummyWpfModeless.Model;
-using ExcavationMethod.Revit.Application.Buttons.DummyWpfModeless.ViewModel;
-using ExcavationMethod.Revit.Application.Buttons.DummyWpfModeless.View;
 using System.Reflection;
 using ExcavationMethod.Revit.Utilities;
 using ExcavationMethod.Revit.Application.Resources;
+using ExcavationMethod.Revit.Application.Buttons.InstallPiles.Model;
+using ExcavationMethod.Revit.Application.Buttons.InstallPiles.ViewModel;
+using ExcavationMethod.Revit.Application.Buttons.InstallPiles.View;
 
-namespace ExcavationMethod.Revit.Application.Buttons.DummyWpfModeless
+namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles
 {
     [Transaction(TransactionMode.Manual)]
     [Regeneration(RegenerationOption.Manual)]
     [Journaling(JournalingMode.NoCommandData)]
-    public class DummyWpfModelessCommand : IExternalCommand
+    public class InstallPilesCommand : IExternalCommand
     {
-        readonly string ButtonName = "Dummy Wpf\nModeless";
-        readonly string ButtonDescription = "toolTip description goes here";
-        readonly string ButtonIcon = IconsPackX32.Placeholder;
+        readonly string ButtonName = "Install Piles";
+        readonly string ButtonDescription = "Install Piles with equal spacing along the reference";
+        readonly string ButtonIcon = IconsPackX32.InstallPiles;
+
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
-            try 
+            try
             {
-                // Initialize the linke between [model] => [view model] => view
+                // initialize the link between [model] => [view model] => [view]
                 var uiApp = commandData.Application;
-                var m = new DummyWpfModelessModel(uiApp);
-                var vm = new DummyWpfModelessViewModel(m);
-                var v = new DummyWpfModelessView
+                var m = new InstallPilesModel(uiApp);
+                var vm = new InstallPilesViewModel(m);
+                var v = new InstallPilesView
                 {
                     DataContext = vm,
                 };
 
-                // close windows if Revit is closed
+                v.Show();
+
+                // close when Revit is closed
                 var unused = new WindowInteropHelper(v)
                 {
                     Owner = Process.GetCurrentProcess().MainWindowHandle
                 };
 
-                v.Show();
-
                 return Result.Succeeded;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return Result.Failed;
             }
         }
 
         public static void CreateButton(RibbonPanel panel)
-        {        
-            DummyWpfModelessCommand command = new DummyWpfModelessCommand();
+        {
+            InstallPilesCommand command = new InstallPilesCommand();
             string buttonName = command.ButtonName;
             string buttonDescription = command.ButtonDescription;
             string buttonIcon = command.ButtonIcon;
@@ -61,7 +62,7 @@ namespace ExcavationMethod.Revit.Application.Buttons.DummyWpfModeless
             string? methodName = MethodBase.GetCurrentMethod().DeclaringType?.Name;
             string? methodFullName = MethodBase.GetCurrentMethod().DeclaringType?.FullName;
 
-            if(methodName != null && methodFullName != null)
+            if (methodName != null && methodFullName != null)
             {
                 PushButtonData button = RibbonUtils.FillPushButtonData(assembly, methodName, buttonName, methodFullName, buttonDescription, buttonIcon);
                 panel.AddItem(button);

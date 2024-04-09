@@ -20,6 +20,7 @@ using ExcavationMethod.Abstractions.Telemetry;
 using ExcavationMethod.Revit.Application.Buttons.DummyWpfModeless;
 using ExcavationMethod.Revit.Application.Resources;
 using ExcavationMethod.Telemetry;
+using ExcavationMethod.Revit.Application.Buttons.InstallPiles;
 
 namespace ExcavationMethod.Revit.Application
 {
@@ -32,12 +33,15 @@ namespace ExcavationMethod.Revit.Application
         //Tab name
         private string TabName = "AECOM Digital";
 
-        // Panel naem (add new panel name with new private string if needed)
+        // Panel name (add new panel name with new private string if needed)
         #region Dummy examples
         //declare name of dummy panel
         private string DummyPanel = "Dummy";
         #endregion
-        //private string PilingPanel = "Piling";
+
+        #region panel name as string
+        private string PillingPanel = "Piling";
+        #endregion
 
         private UIControlledApplication? _uiCtrlApp;
         private UIApplication? _uiApp;
@@ -49,13 +53,17 @@ namespace ExcavationMethod.Revit.Application
         public AuthenticationResult? AuthenticationResult { get; set; }
         public bool IsAuthenticated { get; set; }
 
-        #region Dummy examples
+        #region Dummy examples - declare external event and request handler
         // declare external event and request handler of dummy button
         public ExternalEvent? DummyWpfModelessEE { get; set; }
         public DummyWpfModelessRequestHandler? DummyWpfModelessRH { get; set; }
         #endregion
 
-        //public PileNumberingRequestHandler PileNumberingRH { get; set; }
+        #region external event and request handler
+        // declare external event and request handler
+        public ExternalEvent? InstallPilesEE { get; set; }
+        public InstallPilesRequestHandler? InstallPilesRH { get; set; }
+        #endregion
 
         public List<Autodesk.Windows.RibbonItem>? RibbonItems { get; private set; }
 
@@ -122,17 +130,19 @@ namespace ExcavationMethod.Revit.Application
                 //ignore
             }
 
+            #region Dummy examples - create ribbon, button, and register request handler for dummy button
             var dummyPanel = app.GetRibbonPanels(TabName).FirstOrDefault(p => p.Name == DummyPanel) ??
                 app.CreateRibbonPanel(TabName, DummyPanel);
             DummyWpfModelessCommand.CreateButton(dummyPanel);
-            /*
-            RibbonUtils.CreateButton(
-                dummyPanel,
-                "Dummy Wpf\nModeless",
-                "This is modeless dialog using WPF UI",
-                IconsPackX32.Placeholder);
-            */
             DummyWpfModelessRequestHandler.RegisterHandler();
+            #endregion
+
+            #region ribbon, button, and register request handler
+            var pillingPanel = app.GetRibbonPanels(TabName).FirstOrDefault(p => p.Name == PillingPanel) ??
+                app.CreateRibbonPanel(TabName, PillingPanel);
+            InstallPilesCommand.CreateButton(pillingPanel);
+            InstallPilesRequestHandler.RegisterHandler();
+            #endregion
 
             // Subscribe to the click UI event.
             ComponentManager.ItemExecuted += ComponentManager_ItemExecuted;
