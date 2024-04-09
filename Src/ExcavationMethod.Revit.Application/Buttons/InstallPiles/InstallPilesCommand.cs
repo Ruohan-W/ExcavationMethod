@@ -7,6 +7,9 @@ using Autodesk.Revit.DB;
 using System.Reflection;
 using ExcavationMethod.Revit.Utilities;
 using ExcavationMethod.Revit.Application.Resources;
+using ExcavationMethod.Revit.Application.Buttons.InstallPiles.Model;
+using ExcavationMethod.Revit.Application.Buttons.InstallPiles.ViewModel;
+using ExcavationMethod.Revit.Application.Buttons.InstallPiles.View;
 
 namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles
 {
@@ -17,12 +20,29 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles
     {
         readonly string ButtonName = "Install Piles";
         readonly string ButtonDescription = "Install Piles with equal spacing along the reference";
-        readonly string ButtonIcon = IconsPackX32.Placeholder;
+        readonly string ButtonIcon = IconsPackX32.InstallPiles;
 
         public Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             try
             {
+                // initialize the link between [model] => [view model] => [view]
+                var uiApp = commandData.Application;
+                var m = new InstallPilesModel(uiApp);
+                var vm = new InstallPilesViewModel(m);
+                var v = new InstallPilesView
+                {
+                    DataContext = vm,
+                };
+
+                v.Show();
+
+                // close when Revit is closed
+                var unused = new WindowInteropHelper(v)
+                {
+                    Owner = Process.GetCurrentProcess().MainWindowHandle
+                };
+
                 return Result.Succeeded;
             }
             catch (Exception ex)

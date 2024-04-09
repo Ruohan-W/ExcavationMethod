@@ -59,11 +59,13 @@
   </PropertyGroup>
 	
   <ItemGroup>
+    <None Remove="Resources\32x32\InstallPiles.png" />
     <None Remove="Resources\32x32\Placeholder.png" />
     <None Remove="Resources\Logo\AECOM_White.png" />
   </ItemGroup>
 	
   <ItemGroup>
+    <EmbeddedResource Include="Resources\32x32\InstallPiles.png" />
     <EmbeddedResource Include="Resources\32x32\Placeholder.png" />
     <EmbeddedResource Include="Resources\Logo\AECOM_White.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -98,9 +100,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Buttons\InstallPiles\Model\" />
-    <Folder Include="Buttons\InstallPiles\ViewModel\" />
-    <Folder Include="Buttons\InstallPiles\View\" />
     <Folder Include="Properties\" />
   </ItemGroup>
 
