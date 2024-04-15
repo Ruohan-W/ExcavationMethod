@@ -1,5 +1,9 @@
-﻿using Autodesk.Revit.DB;
+﻿using ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers;
+
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using Autodesk.Revit.UI.Selection;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using ExcavationMethod.Revit.Utilities;
 using System;
 using System.Collections.Generic;
@@ -19,6 +23,8 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles
         public static RequestId RequestId { get; set; }
         public static InstallPilesRequestHandler? RequestHandler { get; set; }
         public static ExternalEvent? ExternalEventHandler { get; set; }
+
+        public InstallPilesHelper Helper = new();
         public void Execute(UIApplication app)
         {
             try
@@ -53,6 +59,10 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles
 
             // select wall from linked file
             // or select 2D or 3D lines from current file
+
+            UIDocument uidoc = new UIDocument(doc);
+            Selection choices = uidoc.Selection;
+            Helper.SelectElements(uidoc);
 
             // select available pile familiy from drop down list
 
