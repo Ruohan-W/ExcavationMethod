@@ -1,4 +1,6 @@
-﻿using Autodesk.Revit.DB;
+﻿using ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers;
+
+using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using CommunityToolkit.Mvvm.DependencyInjection;
@@ -21,6 +23,8 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles
         public static RequestId RequestId { get; set; }
         public static InstallPilesRequestHandler? RequestHandler { get; set; }
         public static ExternalEvent? ExternalEventHandler { get; set; }
+
+        public InstallPilesHelper Helper = new();
         public void Execute(UIApplication app)
         {
             try
@@ -58,12 +62,7 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles
 
             UIDocument uidoc = new UIDocument(doc);
             Selection choices = uidoc.Selection;
-            // Pick one object from Revit.
-            Reference hasPickOne = choices.PickObject(ObjectType.Element);
-            if (hasPickOne != null)
-            {
-                TaskDialog.Show("Revit", "One element selected.");
-            }
+            Helper.SelectElements(uidoc);
 
             // select available pile familiy from drop down list
 
