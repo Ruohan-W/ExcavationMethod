@@ -56,14 +56,18 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles
         private void InstallPiles(UIApplication app) 
         {
             Document doc = app.ActiveUIDocument.Document;
+            UIDocument uidoc = new UIDocument(doc);
 
             // select wall from linked file
-            // or select 2D or 3D lines from current file
-
-            UIDocument uidoc = new UIDocument(doc);
             Selection choices = uidoc.Selection;
-            Helper.SelectElements(uidoc);
-
+            List<BuiltInCategory> bICMask = new List<BuiltInCategory>()
+            {
+                BuiltInCategory.OST_Curves,
+                BuiltInCategory.OST_Walls,
+            };
+            Helper.SelectElements(uidoc, bICMask, choices);
+            
+            // or select 2D or 3D lines from current file
             // select available pile familiy from drop down list
 
             // set the offset and spacing

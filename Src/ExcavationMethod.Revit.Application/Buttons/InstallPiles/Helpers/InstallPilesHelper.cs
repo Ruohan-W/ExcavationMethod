@@ -2,7 +2,9 @@
 using Autodesk.Revit.DB.Architecture;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
+using CommunityToolkit.Mvvm.DependencyInjection;
 using Microsoft.Graph.Models;
+using NPOI.OpenXmlFormats.Dml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +18,20 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
         #region helper functions for request handler
         // UI selection and filter
         // select one or multiple elements
-        public void SelectElements(UIDocument uidoc)
+        public void SelectElements(UIDocument uidoc, List<BuiltInCategory> bICList, Selection choices)
         {
             Document doc = uidoc.Document;
-            Selection choices = uidoc.Selection;
-            WallsAndLinesSelectionFilter<Wall> selFilter = new WallsAndLinesSelectionFilter<Wall>(doc);
+            ElementAndLinkElementSelectionFilter selFilter = new ElementAndLinkElementSelectionFilter(doc);
+            selFilter.BuiltInCategoryMask.AddRange(bICList);
+
+            // Pick multiple object from Revit.
+            IList<Reference> pickedElementList = choices.PickObjects(ObjectType.PointOnElement, selFilter, "Select wall or curve elements.");
+            if (pickedElementList.Count > 0) 
+            {
+                List<ElementId> pickedElemetnIdList = pickedElementList.Select(re => re.ElementId).ToList();
+                //HighlightElement(uidoc, pickedElemetnIdList);
+                TaskDialog.Show("Revit", string.Format("{0} element(s) added to selection.", pickedElemetnIdList.Count));
+            }
 
             #region pick single element
             /*
@@ -32,15 +43,6 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
             }
             */
             #endregion
-
-
-            // Pick multiple object from Revit.
-            IList<Reference> pickedElementList = choices.PickObjects(ObjectType.PointOnElement, selFilter, "Select multiple elements");
-            if (pickedElementList.Count > 0) 
-            {
-                IList<ElementId> pickedElemetnIdList = pickedElementList.Select(re => re.ElementId).ToList();
-                TaskDialog.Show("Revit", string.Format("{0} element(s) added to selection.", pickedElemetnIdList.Count));
-            }
 
             #region pick multiple elements
             /*
@@ -57,7 +59,8 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
             */
             #endregion
         }
-        // 
+        
+
         #endregion
     }
 }

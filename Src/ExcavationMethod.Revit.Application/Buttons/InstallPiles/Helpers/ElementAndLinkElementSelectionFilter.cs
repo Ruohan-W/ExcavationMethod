@@ -11,20 +11,23 @@ using System.Threading.Tasks;
 
 namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
 {
-    public class WallsAndLinesSelectionFilter<T> : ISelectionFilter where T : Element
+    public class ElementAndLinkElementSelectionFilter : ISelectionFilter
     {
         private Autodesk.Revit.DB.Document _doc;
+        public List<BuiltInCategory> BuiltInCategoryMask { get; set; }
         public Autodesk.Revit.DB.Document? LinkedDocument { get; private set; } = null;
 
-        public WallsAndLinesSelectionFilter(Autodesk.Revit.DB.Document doc)
-        {
-            _doc = doc;
-        }
-
         public bool FromLink
-        {  
+        {
             get { return null != LinkedDocument; }
         }
+
+        public ElementAndLinkElementSelectionFilter(Autodesk.Revit.DB.Document doc)
+        {
+            _doc = doc;
+            BuiltInCategoryMask = new List<BuiltInCategory>();
+        }
+
         public bool AllowElement(Element element)
         {
             return true;
@@ -37,7 +40,7 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
 
             bool result = false;
 
-            if ( e is RevitLinkInstance)
+            if ( e != null && e is RevitLinkInstance)
             {
                 RevitLinkInstance linkInstance = (RevitLinkInstance) e;
                 LinkedDocument = linkInstance.GetLinkDocument();
@@ -45,19 +48,14 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
                 e = LinkedDocument.GetElement(refer.LinkedElementId);
             }
 
-            /*
-            if (e is FamilyInstance)
+            if (e?.Category == null)
             {
-                FamilyInstance eInstance = (FamilyInstance) e;
-                result = eInstance.Category.BuiltInCategory is BuiltInCategory.OST_Walls or BuiltInCategory.OST_Lines;
-            }
-            */
-            T? selInstance  = e as T;
-            if ( selInstance != null ) 
-            {
-                result = true;
+                return result; 
             }
 
+            BuiltInCategory elemBIC = e.Category.BuiltInCategory;
+            result = BuiltInCategoryMask.Contains(elemBIC);
+                        
             return result;
         }
     }
