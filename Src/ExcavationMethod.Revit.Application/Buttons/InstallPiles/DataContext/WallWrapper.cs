@@ -10,25 +10,27 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.DataContext
 {
     public partial class WallWrapper : ObservableObject
     {
-        public ElementId ElementId { get; }
-        public Curve LocationCurve { get; }
-        public double WallThickness { get; }
+        public ElementId? ElementId { get; }
+        public Curve? LocationCurve { get; }
+        public double? WallThickness { get; }
 
         public WallWrapper(Document doc, Face face)
         {
-            FamilyInstance wallInstance = GetWallInstance(doc, face);
-            ElementId = wallInstance.Id;
-            LocationCurve = GetLocationCurveFromWall(wallInstance);
-            WallThickness = GetWallWidth(doc, wallInstance);
+            FamilyInstance? wallInstance = GetWallInstance(doc, face);
 
+            if(wallInstance != null)
+            {
+                ElementId = wallInstance.Id;
+                LocationCurve = GetLocationCurveFromWall(wallInstance);
+                WallThickness = GetWallWidth(doc, wallInstance);
+            }
         }
 
-        public FamilyInstance GetWallInstance(Document doc, Face f)
+        public FamilyInstance? GetWallInstance(Document doc, Face f)
         {
-            FamilyInstance wallInstance = doc.GetElement(f.Reference) as FamilyInstance;
+            FamilyInstance? wallInstance = doc.GetElement(f.Reference) as FamilyInstance;
             return wallInstance;
         }
-
         public Curve GetLocationCurveFromWall(FamilyInstance wallInstance)
         {
             LocationCurve lc = (LocationCurve)wallInstance.Location;
@@ -39,7 +41,7 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.DataContext
         public double GetWallWidth(Document doc, FamilyInstance wallInstance)
         {
             WallType? wallType = doc.GetElement(wallInstance.GetTypeId()) as WallType;
-            double nativeWidth = wallType.Width;
+            double nativeWidth = wallType != null ? wallType.Width : 0;
             double milimeterWidth = UnitUtils.ConvertFromInternalUnits(nativeWidth, UnitTypeId.Millimeters);
 
             // convert to inches for imperial unit system if needed.
