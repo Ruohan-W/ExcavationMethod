@@ -10,13 +10,20 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers.Extens
 {
     public static class XYZExtension
     {
+        public static Point VisualizeAsPoint(
+            this XYZ coord, Document document)
+        {
+            Point point = Point.Create(coord);
+            document.CreateDirectShape(new List<GeometryObject>() { point });
+            return point;
+        }
         public static Autodesk.Revit.DB.Line VisualizeVectorAsLine(
             this XYZ vector, Document document, XYZ? origin = null)
         {
             origin ??= XYZ.Zero;
             var endPoint = origin + vector;
-            Autodesk.Revit.DB.Line line = Autodesk.Revit.DB.Line.CreateBound(origin, vector);
-            document.CreateDirectShape(new List<GeometryObject>() { line, Point.Create(endPoint) });
+            Autodesk.Revit.DB.Line line = Autodesk.Revit.DB.Line.CreateBound(origin, endPoint);
+            document.CreateDirectShape(new List<GeometryObject>() { line });
             return line;
         }
     }

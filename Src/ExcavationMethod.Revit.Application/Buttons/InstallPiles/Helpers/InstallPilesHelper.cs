@@ -9,6 +9,7 @@ using NPOI.OpenXmlFormats.Dml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -92,6 +93,8 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
                     {
                         transaction.Start();
                         doc.CreateDirectShape(new List<GeometryObject>() { c, Point.Create(refPt), Point.Create(projectedRefPt) });
+                        XYZ v = new XYZ(1, 2, 5)!;
+                        v.VisualizeVectorAsLine(doc, refPt);
                         transaction.Commit();
                     }
 
