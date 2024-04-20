@@ -1,11 +1,13 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
+using Autodesk.Revit.DB.Visual;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using CommunityToolkit.Mvvm.DependencyInjection;
 using ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers.Extensions;
 using Microsoft.Graph.Models;
 using NPOI.OpenXmlFormats.Dml;
+using NPOI.SS.Formula.Functions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,46 +75,53 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
             {
                 Reference r = rList[i];
                 Element e = doc.GetElement(r.ElementId);
-                BoundingBoxXYZ bb = e.get_BoundingBox(null);
-                XYZ refPt = bb.Max;
-
                 string rTName = rTypeNameList[i];
                 if (rTName.Contains("surface"))
                 {
-                    Face face = (Face)doc.GetElement(r).GetGeometryObjectFromReference(r);
+                    /*
                     // get center line / location line from wall instance.
                     Curve c = (doc.GetElement(r).Location as LocationCurve)!.Curve;
+
+                    // get all edges from face, then found the one with largest Z at its bouding box.
+                    Face face = (Face)doc.GetElement(r).GetGeometryObjectFromReference(r);
+                    IList<Curve> curvesFromEdge = new List<Curve>();
+                    foreach (EdgeArray eArr in face.EdgeLoops)
+                    {
+                        foreach (Autodesk.Revit.DB.Edge edge in eArr)
+                        {
+                            curvesFromEdge.Add(edge.AsCurve());
+                        }
+                    }
+                    XYZ endPointAtTopEdgeCurve = curvesFromEdge.Where(c => c.IsBound)
+                        .OrderBy(c => c.GetEndPoint(0).Z > c.GetEndPoint(1).Z ? c.GetEndPoint(1).Z : c.GetEndPoint(0).Z)
+                        .Reverse()
+                        .FirstOrDefault()
+                        .GetEndPoint(0);
+
+
+                    double curveZ = c.GetEndPoint(0).Z;
+                    double endPointAtTopEdgeCurveZ = endPointAtTopEdgeCurve.Z;
+                    XYZ transferVector = new XYZ(0, 0, curveZ - endPointAtTopEdgeCurveZ);
+                    XYZ refPt = endPointAtTopEdgeCurve + transferVector;
 
                     XYZ projectedRefPt = c.Project(refPt).XYZPoint;
                     // XYZ refVector = (refPt - projectedRefPt).Normalize();
                     double offsetLength = (refPt - projectedRefPt).GetLength();
                     var offsetCurve = c.CreateOffset(offsetLength, XYZ.BasisZ);
+                    */
 
+                    Curve topCurve = GetTopEdgeFromSurfaceReference(r, doc);
                     // visualize all the elements above
                     using (var transaction = new Transaction(doc, "Visulaize elements"))
                     {
                         transaction.Start();
-                        doc.CreateDirectShape(new List<GeometryObject>() { c, Point.Create(refPt), Point.Create(projectedRefPt) });
-                        XYZ v = new XYZ(1, 2, 5)!;
-                        v.VisualizeVectorAsLine(doc, refPt);
+                        doc.CreateDirectShape([topCurve]);
                         transaction.Commit();
                     }
 
                     // how to get to the curve? 
                     /*
-                    // get all edges from face, then found the one with largest Z at its bouding box.
-                    IList<Curve> curvesFromEdge = new List<Curve>();
-                    foreach (EdgeArray eArr in face.EdgeLoops)
-                    {
-                        foreach(Autodesk.Revit.DB.Edge edge in eArr)
-                        {
-                            curvesFromEdge.Add(edge.AsCurve());
-                        }
-                    }
-                    Curve topEdgeCurve = curvesFromEdge.Where(c => c.IsBound)
-                        .OrderBy(c => c.GetEndPoint(0).Z > c.GetEndPoint(1).Z ? c.GetEndPoint(1) : c.GetEndPoint(0))
-                        .Reverse()
-                        .FirstOrDefault();
+
                     */
 
                     // hilghest point of the bounding box of wall.
@@ -127,6 +136,103 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
 
             }
             // return curve
+        }
+
+        public Curve GetTopEdgeFromSurfaceReference(Reference r, Document doc)
+        {
+            EdgeArrayArray edgeArrayArray = ((Face)doc.GetElement(r).GetGeometryObjectFromReference(r))!.EdgeLoops;
+            IList<Curve> edgesAsCurves = new List<Curve>();
+            foreach (EdgeArray eArr in edgeArrayArray)
+            {
+                foreach (Autodesk.Revit.DB.Edge edge in eArr)
+                {
+                    edgesAsCurves.Add(edge.AsCurve());
+                }
+            }
+            List<Curve> topEdgesAsCurves = edgesAsCurves.Where(c => c.IsBound)
+                .GroupBy(c => c.GetEndPoint(0).Z > c.GetEndPoint(1).Z ? c.GetEndPoint(1).Z : c.GetEndPoint(0).Z)
+                .OrderBy(g => g.Key)
+                .FirstOrDefault()
+                .Select(g => g)
+                .ToList();
+
+            if (topEdgesAsCurves.Count == 1)
+            {
+                return topEdgesAsCurves[0];
+            }
+            else
+            {     
+                Curve firstCurve = topEdgesAsCurves[0]; 
+                if(firstCurve is Line)
+                {
+                    List<XYZ> endPoints = topEdgesAsCurves.SelectMany(c => GetEndPoints(c)).ToList();
+                    List<XYZ> coords = GetFarestCoordinateFromPoints(endPoints);
+                    Curve simplifiedTopEdgeLine = Line.CreateBound(coords[0], coords[1]);
+                    return simplifiedTopEdgeLine;
+                }
+                else
+                {
+                    List<Arc> arcList = topEdgesAsCurves.Select(c => (Arc)c).ToList();
+                    Arc simplifiedArc = GetArcFromArcSegement(arcList);
+                    return simplifiedArc as Curve;
+                }
+            }
+        }
+
+        public List<XYZ> GetEndPoints( Curve c)
+        {
+            return [c.GetEndPoint(0), c.GetEndPoint(1)];
+        }
+
+        public List<XYZ> GetFarestCoordinateFromPoints(List<XYZ> coordList)
+        {
+            List<Line> lineList = new List<Line>();
+            for(int i = 0; i < coordList.Count - 1; i++)
+            {
+                XYZ coordStart = coordList[i];
+                for (int j = i+1; j < coordList.Count; j++)
+                {
+                    XYZ coordEnd = coordList[j];
+                    Line line = Line.CreateBound(coordStart, coordEnd);
+                    lineList.Add(line);
+                }
+            }
+
+            Line longestLine = lineList.OrderBy(l => l.Length)
+                .LastOrDefault();
+            List<XYZ> coords = GetEndPoints(longestLine);
+
+            return coords;
+        }
+
+        public Arc GetArcFromArcSegement(List<Arc> arcList)
+        {
+            XYZ center = arcList[0].Center;
+            List<XYZ> endCoords = arcList.SelectMany(c => GetEndPoints(c))
+                .Select(pt=> pt - center)
+                .ToList();
+
+            List<Tuple<double, List<XYZ>>> anglesAndCoords = new List<Tuple<double, List<XYZ>>>();  
+            for(int i  = 0; i < endCoords.Count - 1; i++)
+            {
+                XYZ endCoordA = endCoords[i];
+                XYZ vectorA = endCoordA - center;
+                for (int j = i+1; j < endCoords.Count; j++)
+                {
+                    XYZ endCoordB = endCoords[j];
+                    XYZ vectorB = endCoordB - center;
+
+                    double angle = vectorA.AngleTo(vectorB);
+                    List<XYZ> startPtAndEndPt = [endCoordA, endCoordB];
+                    anglesAndCoords.Add( new Tuple<double, List<XYZ>>(angle, startPtAndEndPt));
+                }
+            }
+            List<XYZ> startAndEndOfSimplifiedArc = anglesAndCoords.OrderBy(t => t.Item1)
+                .LastOrDefault()
+                .Item2;
+
+            Arc simplifiedArc = Arc.Create(startAndEndOfSimplifiedArc[0], center, startAndEndOfSimplifiedArc[1]);
+            return simplifiedArc;
         }
 
         #endregion

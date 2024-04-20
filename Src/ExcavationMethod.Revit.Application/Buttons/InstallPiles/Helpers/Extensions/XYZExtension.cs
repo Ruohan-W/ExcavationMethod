@@ -14,7 +14,7 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers.Extens
             this XYZ coord, Document document)
         {
             Point point = Point.Create(coord);
-            document.CreateDirectShape(new List<GeometryObject>() { point });
+            document.CreateDirectShape([point]);
             return point;
         }
         public static Autodesk.Revit.DB.Line VisualizeVectorAsLine(
@@ -23,7 +23,7 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers.Extens
             origin ??= XYZ.Zero;
             var endPoint = origin + vector;
             Autodesk.Revit.DB.Line line = Autodesk.Revit.DB.Line.CreateBound(origin, endPoint);
-            document.CreateDirectShape(new List<GeometryObject>() { line });
+            document.CreateDirectShape([line]);
             return line;
         }
     }
