@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.Creation;
+using ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers;
 
 using NPOI.POIFS.Storage;
 using System;
@@ -12,6 +13,7 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers.Extens
 {
     public static class DocumentExtensions
     {
+        public static Color red = new Color(255, 0, 0);
         public static DirectShape CreateDirectShape(
             this Autodesk.Revit.DB.Document doc, 
             List<GeometryObject> geometryObjects,

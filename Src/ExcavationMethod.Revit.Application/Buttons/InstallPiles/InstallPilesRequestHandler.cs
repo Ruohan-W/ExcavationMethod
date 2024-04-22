@@ -60,12 +60,20 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles
 
             // select wall from linked file
             Selection choices = uidoc.Selection;
+            // allow reference type
+            List<ElementReferenceType> eRTMask = new List<ElementReferenceType>()
+            {
+                ElementReferenceType.REFERENCE_TYPE_LINEAR,
+                ElementReferenceType.REFERENCE_TYPE_SURFACE,
+            };
+            // allow referen from element OST_Curves, and OST_Walls
             List<BuiltInCategory> bICMask = new List<BuiltInCategory>()
             {
                 BuiltInCategory.OST_Curves,
                 BuiltInCategory.OST_Walls,
             };
-            Helper.SelectElements(uidoc, bICMask, choices);
+
+            Helper.SelectElements(uidoc, bICMask, eRTMask, choices);
             
             // or select 2D or 3D lines from current file
             // select available pile familiy from drop down list

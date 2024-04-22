@@ -22,10 +22,11 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
         #region helper functions for request handler
         // UI selection and filter
         // select one or multiple elements
-        public void SelectElements(UIDocument uidoc, List<BuiltInCategory> bICList, Selection choices)
+        public void SelectElements(UIDocument uidoc, List<BuiltInCategory>? bICList, List<ElementReferenceType>? eRTList, Selection choices)
         {
             Document doc = uidoc.Document;
             ElementAndLinkElementSelectionFilter selFilter = new ElementAndLinkElementSelectionFilter(doc);
+            selFilter.ElementReferenceTypeMask.AddRange(eRTList);
             selFilter.BuiltInCategoryMask.AddRange(bICList);
 
             // Pick multiple object from Revit.
@@ -77,57 +78,16 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
                 Element e = doc.GetElement(r.ElementId);
                 string rTName = rTypeNameList[i];
                 if (rTName.Contains("surface"))
-                {
-                    /*
-                    // get center line / location line from wall instance.
-                    Curve c = (doc.GetElement(r).Location as LocationCurve)!.Curve;
-
-                    // get all edges from face, then found the one with largest Z at its bouding box.
-                    Face face = (Face)doc.GetElement(r).GetGeometryObjectFromReference(r);
-                    IList<Curve> curvesFromEdge = new List<Curve>();
-                    foreach (EdgeArray eArr in face.EdgeLoops)
-                    {
-                        foreach (Autodesk.Revit.DB.Edge edge in eArr)
-                        {
-                            curvesFromEdge.Add(edge.AsCurve());
-                        }
-                    }
-                    XYZ endPointAtTopEdgeCurve = curvesFromEdge.Where(c => c.IsBound)
-                        .OrderBy(c => c.GetEndPoint(0).Z > c.GetEndPoint(1).Z ? c.GetEndPoint(1).Z : c.GetEndPoint(0).Z)
-                        .Reverse()
-                        .FirstOrDefault()
-                        .GetEndPoint(0);
-
-
-                    double curveZ = c.GetEndPoint(0).Z;
-                    double endPointAtTopEdgeCurveZ = endPointAtTopEdgeCurve.Z;
-                    XYZ transferVector = new XYZ(0, 0, curveZ - endPointAtTopEdgeCurveZ);
-                    XYZ refPt = endPointAtTopEdgeCurve + transferVector;
-
-                    XYZ projectedRefPt = c.Project(refPt).XYZPoint;
-                    // XYZ refVector = (refPt - projectedRefPt).Normalize();
-                    double offsetLength = (refPt - projectedRefPt).GetLength();
-                    var offsetCurve = c.CreateOffset(offsetLength, XYZ.BasisZ);
-                    */
-
+                {            
                     Curve topCurve = GetTopEdgeFromSurfaceReference(r, doc);
                     // visualize all the elements above
                     using (var transaction = new Transaction(doc, "Visulaize elements"))
                     {
                         transaction.Start();
-                        doc.CreateDirectShape([topCurve]);
+                        DirectShape directShape = doc.CreateDirectShape([topCurve]);
+                        SetElementColor(doc, new List<ElementId>() { directShape.Id }, new Color(255, 0, 0));
                         transaction.Commit();
                     }
-
-                    // how to get to the curve? 
-                    /*
-
-                    */
-
-                    // hilghest point of the bounding box of wall.
-
-                    // offset curve to the selected edage.
-
                 }
                 if(rTName == "linear")
                 {
@@ -150,9 +110,9 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
                 }
             }
             List<Curve> topEdgesAsCurves = edgesAsCurves.Where(c => c.IsBound)
-                .GroupBy(c => c.GetEndPoint(0).Z > c.GetEndPoint(1).Z ? c.GetEndPoint(1).Z : c.GetEndPoint(0).Z)
+                .GroupBy(c => Math.Round(Math.Min(c.GetEndPoint(0).Z, c.GetEndPoint(1).Z),6))
                 .OrderBy(g => g.Key)
-                .FirstOrDefault()
+                .LastOrDefault()
                 .Select(g => g)
                 .ToList();
 
@@ -161,29 +121,35 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
                 return topEdgesAsCurves[0];
             }
             else
-            {     
-                Curve firstCurve = topEdgesAsCurves[0]; 
-                if(firstCurve is Line)
+            {
+                // get center line / location line from wall instance.
+                Curve locationCurve = (doc.GetElement(r).Location as LocationCurve)!.Curve;
+                if (locationCurve is Line)
                 {
-                    List<XYZ> endPoints = topEdgesAsCurves.SelectMany(c => GetEndPoints(c)).ToList();
-                    List<XYZ> coords = GetFarestCoordinateFromPoints(endPoints);
+                    List<XYZ> endPoints = topEdgesAsCurves
+                        .SelectMany(c => GetEndPoints(c))
+                        .ToList();                
+                    endPoints = RemoveDuplicatedXYZ(endPoints); // get rid of duplicate XYZ from list
+
+                    double highestElevation = endPoints.Max(c => c.Z);
+                    List<XYZ> coords = GetFarestCoordinateFromPoints(endPoints)
+                        .Select(pt =>  new XYZ(pt.X, pt.Y, highestElevation))
+                        .ToList();
                     Curve simplifiedTopEdgeLine = Line.CreateBound(coords[0], coords[1]);
                     return simplifiedTopEdgeLine;
                 }
                 else
-                {
+                {                 
                     List<Arc> arcList = topEdgesAsCurves.Select(c => (Arc)c).ToList();
-                    Arc simplifiedArc = GetArcFromArcSegement(arcList);
+                    Arc simplifiedArc = GetArcFromArcSegement(arcList, doc, locationCurve);
                     return simplifiedArc as Curve;
                 }
             }
         }
-
         public List<XYZ> GetEndPoints( Curve c)
         {
             return [c.GetEndPoint(0), c.GetEndPoint(1)];
         }
-
         public List<XYZ> GetFarestCoordinateFromPoints(List<XYZ> coordList)
         {
             List<Line> lineList = new List<Line>();
@@ -204,37 +170,50 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
 
             return coords;
         }
-
-        public Arc GetArcFromArcSegement(List<Arc> arcList)
+        public Arc GetArcFromArcSegement(List<Arc> arcList, Document doc, Curve locationCurve)
         {
-            XYZ center = arcList[0].Center;
-            List<XYZ> endCoords = arcList.SelectMany(c => GetEndPoints(c))
-                .Select(pt=> pt - center)
+            XYZ center = ((Arc)locationCurve).Center;
+            List<XYZ> endCoords = arcList.SelectMany(c => GetEndPoints(c)).ToList();
+            endCoords = RemoveDuplicatedXYZ(endCoords)
+                .OrderBy(c => locationCurve.Project(c).Parameter)
                 .ToList();
 
-            List<Tuple<double, List<XYZ>>> anglesAndCoords = new List<Tuple<double, List<XYZ>>>();  
-            for(int i  = 0; i < endCoords.Count - 1; i++)
-            {
-                XYZ endCoordA = endCoords[i];
-                XYZ vectorA = endCoordA - center;
-                for (int j = i+1; j < endCoords.Count; j++)
-                {
-                    XYZ endCoordB = endCoords[j];
-                    XYZ vectorB = endCoordB - center;
+            double highestElevation = endCoords.Max(c => c.Z);
+            List<XYZ> pontsOnArcList = [endCoords.First(), endCoords.Last(), endCoords[1]];
+            List<XYZ> pointsOnArcAtHighestElevation = pontsOnArcList.Select(pt => new XYZ(pt.X, pt.Y, highestElevation)).ToList();
 
-                    double angle = vectorA.AngleTo(vectorB);
-                    List<XYZ> startPtAndEndPt = [endCoordA, endCoordB];
-                    anglesAndCoords.Add( new Tuple<double, List<XYZ>>(angle, startPtAndEndPt));
-                }
-            }
-            List<XYZ> startAndEndOfSimplifiedArc = anglesAndCoords.OrderBy(t => t.Item1)
-                .LastOrDefault()
-                .Item2;
+            Arc simplifiedArc = Arc.Create(pointsOnArcAtHighestElevation[0], pointsOnArcAtHighestElevation[1], pointsOnArcAtHighestElevation[2]);
 
-            Arc simplifiedArc = Arc.Create(startAndEndOfSimplifiedArc[0], center, startAndEndOfSimplifiedArc[1]);
             return simplifiedArc;
         }
+        public void SetElementColor(Document doc, List<ElementId> elementIds, Color? color)
+        {
+            color ??= new Color(255, 0, 0);
+            OverrideGraphicSettings ogs = new OverrideGraphicSettings();
+            ogs.SetProjectionLineColor(color);
+            ogs.SetProjectionLineWeight(8);
+            ogs.SetSurfaceForegroundPatternColor(color);
+            ogs.SetCutLineColor(color);
+            ogs.SetCutLineWeight(8);
+            ogs.SetCutForegroundPatternColor(color);
 
+            elementIds.ForEach(e => doc.ActiveView.SetElementOverrides(e, ogs));
+        }
+        public List<XYZ> RemoveDuplicatedXYZ(List<XYZ> xYZList)
+        {
+            List<XYZ> xYZWithoutDupList = [xYZList[0]];
+            for(int i = 1; i < xYZList.Count; i++)
+            {
+                XYZ coordA = xYZList[i];
+                bool containSameXYZ = xYZWithoutDupList.Select(coord => coord.IsAlmostEqualTo(coordA, 1.0e-6))
+                    .Contains(true);
+                if(!containSameXYZ)
+                {
+                    xYZWithoutDupList.Add(coordA);
+                }
+            }
+            return xYZWithoutDupList;
+        }
         #endregion
     }
 }
