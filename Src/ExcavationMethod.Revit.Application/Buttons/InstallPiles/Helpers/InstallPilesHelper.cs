@@ -22,19 +22,28 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
         #region helper functions for request handler
         // UI selection and filter
         // select one or multiple elements
-        public void SelectElements(UIDocument uidoc, List<BuiltInCategory>? bICList, List<ElementReferenceType>? eRTList, Selection choices)
+        public void SelectElements(
+            UIDocument uidoc, 
+            Selection choices, 
+            List<BuiltInCategory>? bICList = null, 
+            List<ElementReferenceType>? eRTList = null)
         {
             Document doc = uidoc.Document;
             ElementAndLinkElementSelectionFilter selFilter = new ElementAndLinkElementSelectionFilter(doc);
-            selFilter.ElementReferenceTypeMask.AddRange(eRTList);
-            selFilter.BuiltInCategoryMask.AddRange(bICList);
+            if(bICList != null)
+            {
+                selFilter.ElementReferenceTypeMask.AddRange(eRTList);
+            }
+            if(eRTList !=null)
+            {
+                selFilter.BuiltInCategoryMask.AddRange(bICList);
+            }    
 
             // Pick multiple object from Revit.
             List<Reference> pickedElementList = choices.PickObjects(ObjectType.PointOnElement, selFilter, "Select wall or curve elements.").ToList();
             if (pickedElementList.Count > 0) 
             {
                 List<ElementId> pickedElemetnIdList = pickedElementList.Select(re => re.ElementId).ToList();
-                //HighlightElement(uidoc, pickedElemetnIdList);
                 GetCurveFromReferences(doc, pickedElementList);
                 TaskDialog.Show("Revit", string.Format("{0} element(s) added to selection.", pickedElemetnIdList.Count));
             }
@@ -214,6 +223,7 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
             }
             return xYZWithoutDupList;
         }
+
         #endregion
     }
 }

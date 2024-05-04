@@ -56,26 +56,26 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles
         private void InstallPiles(UIApplication app) 
         {
             Document doc = app.ActiveUIDocument.Document;
-            UIDocument uidoc = new UIDocument(doc);
+            UIDocument uidoc = new(doc);
 
-            // select wall from linked file
+            // select wall or select 2D or 3D lines from current or linked file 
             Selection choices = uidoc.Selection;
             // allow reference type
-            List<ElementReferenceType> eRTMask = new List<ElementReferenceType>()
+            List<ElementReferenceType> eRTMask = new()
             {
                 ElementReferenceType.REFERENCE_TYPE_LINEAR,
                 ElementReferenceType.REFERENCE_TYPE_SURFACE,
             };
             // allow referen from element OST_Curves, and OST_Walls
-            List<BuiltInCategory> bICMask = new List<BuiltInCategory>()
+            List<BuiltInCategory> bICMask = new()
             {
                 BuiltInCategory.OST_Curves,
+                BuiltInCategory.OST_Lines,
                 BuiltInCategory.OST_Walls,
             };
 
-            Helper.SelectElements(uidoc, bICMask, eRTMask, choices);
-            
-            // or select 2D or 3D lines from current file
+            Helper.SelectElements(uidoc, choices, bICMask, eRTMask);
+
             // select available pile familiy from drop down list
 
             // set the offset and spacing

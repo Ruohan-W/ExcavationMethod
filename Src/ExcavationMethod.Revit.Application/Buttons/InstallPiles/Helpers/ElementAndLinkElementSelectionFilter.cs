@@ -38,36 +38,35 @@ namespace ExcavationMethod.Revit.Application.Buttons.InstallPiles.Helpers
         public bool AllowReference(Reference refer, XYZ point)
         {
             bool result = false;
-
             LinkedDocument = null;
             Element e = _doc.GetElement(refer);
 
-            ElementReferenceType eleRT = refer.ElementReferenceType;
-            if (ElementReferenceTypeMask.Count > 0 && !ElementReferenceTypeMask.Contains(eleRT))
+            if (e == null || e?.Category == null)
             {
                 return result;
             }
 
-            if ( e != null && e is RevitLinkInstance)
+            if (e is RevitLinkInstance)
             {
-                RevitLinkInstance linkInstance = (RevitLinkInstance) e;
+                RevitLinkInstance linkInstance = (RevitLinkInstance)e;
                 LinkedDocument = linkInstance.GetLinkDocument();
-
                 e = LinkedDocument.GetElement(refer.LinkedElementId);
             }
 
-            if (e?.Category == null)
+            ElementReferenceType eleRT = refer.ElementReferenceType;
+            BuiltInCategory elemBIC = e!.Category.BuiltInCategory;
+
+            if (ElementReferenceTypeMask.Count>0 && !ElementReferenceTypeMask.Contains(eleRT))
             {
-                return result; 
+                return result;
             }
 
-            BuiltInCategory elemBIC = e.Category.BuiltInCategory;
-            if(BuiltInCategoryMask.Count>0 && BuiltInCategoryMask.Contains(elemBIC))
+            if(BuiltInCategoryMask.Count>0 && !BuiltInCategoryMask.Contains(elemBIC))
             {
-                result = true;
+                return result;
             }
 
-            return result;
+            return true;
         }
     }
 }
